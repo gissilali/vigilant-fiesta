@@ -1,6 +1,16 @@
 # Alx Frontend (alx-frontend)
 
-Alx
+Technical assessment for ALX interview process
+
+This application consist of
+  - VueJs frontend using the Quasar Framework
+  - Simple Laravel back-end that provides dynamic data through an API
+
+##Screenshots
+###Contacts
+![Contacts Screenshots](./screenshots/contacts.png)
+###Dashboard
+![Dashboard Screenshots](./screenshots/dashboard.png)
 
 ## Install the dependencies
 ```bash
@@ -24,3 +34,4 @@ quasar build
 
 ### Customize the configuration
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
+
