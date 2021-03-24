@@ -99,6 +99,7 @@ export default {
             20,
             30,
           ],
+
           backgroundColor: [
             '#2ed47a',
             '#ffb946',
