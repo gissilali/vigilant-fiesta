@@ -1,8 +1,8 @@
 <template>
   <q-page class="q-pa-md-xl q-pa-xs-xs bg-gray">
-    <div class="row q-col-gutter-xl q-col-gutter-xs-md">
+    <div class="row q-col-gutter-md-xl q-col-gutter-xs-xs">
       <div class="col-md-8 col-xs-12">
-        <q-card flat>
+        <q-card class="q-pa-md-lg q-pa-xs-none" flat>
           <q-card-section>
             <p>8 Tasks Completed out of 10</p>
             <q-linear-progress :value="0.8" color="positive" class="q-mt-md"/>
@@ -11,26 +11,7 @@
             </div>
           </q-card-section>
           <q-card-section>
-            <q-card>
-              <q-card-section>
-                <div class="row">
-                  <div class="col">
-                    <p class="text-weight-medium text-grey-9 q-mb-xs text-h6">Send review by Monday</p>
-                    <span class="text-grey-7"><span>Due Date:</span> 5th March 2021</span>
-                  </div>
-                  <span class="text-grey-7 q-mt-xs text-weight-medium">Reminder</span>
-                </div>
-                <div class="row q-mt-md">
-                  <div class="col flex items-center">
-                    <q-avatar size="40px" class="q-mr-md" color="orange">J</q-avatar>
-                    <span class="text-grey-7 ">Joseph K. Link</span>
-                  </div>
-                  <span class="text-grey-7 flex items-center q-mt-xs text-weight-medium">
-                     <q-badge color="positive">Completed</q-badge>
-                  </span>
-                </div>
-              </q-card-section>
-            </q-card>
+            <dashboard-task-item class="q-mb-lg" v-for="(task, index) in recentTasks" :key="index" :task="task"/>
           </q-card-section>
         </q-card>
       </div>
@@ -44,7 +25,7 @@
         <q-card class="q-mt-lg" flat>
           <q-card-section>
             <p class="text-weight-medium text-grey-9 q-mb-xs text-h6">Deals</p>
-            <tasks-donut-chart :options="donutChartOptions" :chart-data="tasksCompletionData"/>
+            <tasks-donut-chart :completed-tasks="completeTasksPercentage"  :options="donutChartOptions" :chart-data="tasksCompletionData"/>
           </q-card-section>
         </q-card>
       </div>
@@ -56,13 +37,21 @@
 import WeekCalendar from 'components/WeekCalendar';
 import DealsLineChart from 'components/DealsLineChart';
 import TasksDonutChart from 'components/TasksDonutChart';
+import axios from 'axios';
+import { env } from 'src/env.config';
+import DashboardTaskItem from 'components/DashboardTaskItem';
+import moment from 'moment';
 
 export default {
   name: 'PageIndex',
   components: {
+    DashboardTaskItem,
     TasksDonutChart,
     DealsLineChart,
     WeekCalendar
+  },
+  created() {
+    this.getTasks();
   },
   data() {
     return {
@@ -74,7 +63,7 @@ export default {
         borderWidth: 5,
         title: {
           display: true,
-          text: 'Chart.js Doughnut Chart'
+          text: 'Task Completion'
         },
         animation: {
           animateScale: true,
@@ -92,12 +81,68 @@ export default {
           }
         ]
       },
-      tasksCompletionData: {
+      tasks: []
+    };
+  },
+  methods: {
+    getRandomInt() {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+    },
+    async getTasks() {
+      const {
+        data,
+        status
+      } = await axios.get(`${env.API_URL}/tasks`);
+      if (status === 200) {
+        this.tasks = data.data;
+      }
+
+      return data.data;
+    },
+    getTaskStatus(task) {
+      if (task.completed_on) {
+        return {
+          'color': 'positive',
+          'description' : 'completed'
+        }
+      }
+      if(moment(task.due_on).isBefore()  && task.completed_on == null) {
+        return {
+          'color': 'negative',
+          'description' : 'ended'
+        }
+      }
+
+      if(moment(task.due_on).isAfter() && task.completed_on == null) {
+        return {
+          'color': 'warning',
+          'description' : 'active'
+        }
+      }
+    },
+    groupBy(items, key) {
+      return items.reduce(function(rv, x) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    }
+  },
+  computed: {
+    recentTasks() {
+      return [...this.tasks].slice(0, 3)
+    },
+    tasksDataSet() {
+      return this.groupBy([...this.tasks].map((task) => {
+        return this.getTaskStatus(task)
+      }), 'description')
+    },
+    tasksCompletionData() {
+      return {
         datasets: [{
           data: [
-            60,
-            20,
-            30,
+            this.tasksDataSet.completed ? this.tasksDataSet.completed.length : 0,
+            this.tasksDataSet.active ? this.tasksDataSet.active.length : 0,
+            this.tasksDataSet.ended ? this.tasksDataSet.ended.length : 0,
           ],
 
           backgroundColor: [
@@ -113,11 +158,9 @@ export default {
           'Ended'
         ]
       }
-    };
-  },
-  methods: {
-    getRandomInt() {
-      return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+    },
+    completeTasksPercentage() {
+      return Math.round((this.tasksDataSet.completed.length /this.tasks.length) * 100);
     }
   }
 };
