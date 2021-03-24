@@ -15,7 +15,7 @@
               <q-card-section>
                 <div class="row">
                   <div class="col">
-                    <p class="text-weight-medium text-grey-9 q-mb-xs text-h6">Send review by sunday</p>
+                    <p class="text-weight-medium text-grey-9 q-mb-xs text-h6">Send review by Monday</p>
                     <span class="text-grey-7"><span>Due Date:</span> 5th March 2021</span>
                   </div>
                   <span class="text-grey-7 q-mt-xs text-weight-medium">Reminder</span>
