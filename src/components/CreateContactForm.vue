@@ -64,6 +64,7 @@
 <script>
 import axios from 'axios';
 import Fuse from 'fuse.js'
+import {env} from 'src/env.config';
 
 export default {
   name: 'CreateContactForm',
@@ -74,7 +75,7 @@ export default {
     }
   },
   created() {
-    axios.get(`${process.env.API_URL}/roles`)
+    axios.get(`${env.API_URL}/roles`)
       .then(({
         data,
         status,
@@ -127,7 +128,7 @@ export default {
       },
       formSubmitting: false,
       roleOptions: [],
-      action: `${process.env.API_URL}/contacts/store`,
+      action: `${env.API_URL}/contacts/store`,
       fuseSearch: null
     };
   },
@@ -145,7 +146,7 @@ export default {
         const {
           data,
           status
-        } = await axios.post(`${process.env.API_URL}/contacts/store`, formData);
+        } = await axios.post(`${env.API_URL}/contacts/store`, formData);
         if (status === 201) {
           this.$emit('event-created', data.data);
         }

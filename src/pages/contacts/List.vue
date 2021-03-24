@@ -104,6 +104,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import CreateContactForm from 'components/CreateContactForm';
+import {env} from 'src/env.config';
 
 export default {
   name: 'List',
@@ -208,7 +209,7 @@ export default {
         const {
           data,
           status,
-        } = await axios.get(`${process.env.API_URL}/contacts`);
+        } = await axios.get(`${env.API_URL}/contacts`);
         if (status === 200) {
           this.loading = false;
           this.contacts = data.data;
@@ -238,7 +239,7 @@ export default {
         const {
           data,
           status,
-        } = await axios.get(`${process.env.API_URL}/companies`);
+        } = await axios.get(`${env.API_URL}/companies`);
         if (status === 200) {
           this.companies = data.data;
         }
@@ -257,7 +258,7 @@ export default {
         persistent: true,
       })
         .onOk(() => {
-          axios.post(`${process.env.API_URL}/contacts/delete`, {
+          axios.post(`${env.API_URL}/contacts/delete`, {
             contacts: this.selectedIds,
           })
             .then(({
