@@ -16,6 +16,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * Plugin to display the text in the middle of the doughnut chart
+     * @param chart
+     */
     textDisplayPlugin (chart) {
       const width = chart.chart.width;
       const height = chart.chart.height;

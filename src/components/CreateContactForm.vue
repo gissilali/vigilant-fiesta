@@ -152,17 +152,27 @@ export default {
         }
       } catch ({ response }) {
         this.formSubmitting = false;
+        /**
+         * Catching validation errors from our backend
+         */
         if (response.status === 422) {
           this.form.errors = response.data.errors;
           return;
         }
-
+        /*
+          Generic error message for what would likely be a server error in our backend
+         */
         this.$q.notify({
           message: 'failed to add contacts',
           color: 'negative'
         });
       }
     },
+    /*
+      We use a text search function to filter through our
+      list of companies populating the select input
+      using the fuse.js fulltext search npm package
+     */
     filterFn(searchString, update) {
       if (searchString === '') {
         update(() => {

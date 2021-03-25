@@ -100,19 +100,27 @@ export default {
       return data.data;
     },
     getTaskStatus(task) {
+      /*
+        Checking if the task is completed
+       */
       if (task.completed_on) {
         return {
           'color': 'positive',
           'description' : 'completed'
         }
       }
+      /*
+      Checking if the task is past due date and is not completed - assign the ended status
+     */
       if(moment(task.due_on).isBefore()  && task.completed_on == null) {
         return {
           'color': 'negative',
           'description' : 'ended'
         }
       }
-
+      /*
+           Checking if the task is not yet past due date and is not completed - assign the active status
+          */
       if(moment(task.due_on).isAfter() && task.completed_on == null) {
         return {
           'color': 'warning',
@@ -132,6 +140,11 @@ export default {
       return [...this.tasks].slice(0, 3)
     },
     tasksDataSet() {
+      /**
+       * Group a clone of the tasks by the status description,
+       * this way we can count tasks by their completion statuses
+       * for our graph data
+       */
       return this.groupBy([...this.tasks].map((task) => {
         return this.getTaskStatus(task)
       }), 'description')
